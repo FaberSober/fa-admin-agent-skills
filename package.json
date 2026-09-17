@@ -1,0 +1,24 @@
+{
+  "name": "@fa-admin/agent-skills",
+  "version": "1.0.0",
+  "description": "Shared AI agent skills for FA Admin projects",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "fa-admin-skills": "bin/fa-admin-skills.mjs"
+  },
+  "files": [
+    "bin",
+    "manifest.json",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "package:check": "node bin/fa-admin-skills.mjs package-check",
+    "pack:check": "npm pack --dry-run"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

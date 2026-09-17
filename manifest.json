@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "skills": [
+    {
+      "name": "fa-admin-backend",
+      "path": "skills/fa-admin-backend"
+    },
+    {
+      "name": "fa-admin-frontend",
+      "path": "skills/fa-admin-frontend"
+    }
+  ]
+}
