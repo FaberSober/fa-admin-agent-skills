@@ -3,13 +3,7 @@
 # 在业务项目中安装
 直接下载安装到.agents/skills目录（推荐）
 ```
-pnpm dlx @fa-admin/agent-skills@1.0.0 sync
-```
-
-先把 npm 包安装到项目，CLI 再把 skills 复制到 .agents/skills
-```
-pnpm add -D @fa-admin/agent-skills@1.0.0 --save-exact
-pnpm exec fa-admin-skills sync
+pnpm dlx @fa-admin/agent-skills@latest sync
 ```
 
 # How to publish
@@ -41,5 +35,5 @@ git push origin main --follow-tags
 然后在每个业务项目中：
 
 ```
-pnpm dlx @fa-admin/agent-skills@1.0.0 sync
+pnpm dlx @fa-admin/agent-skills@latest sync
 ```
