@@ -1,13 +1,17 @@
 ---
 name: fa-admin-backend
-description: FA Admin backend development conventions for this repository. Use when Codex needs to add or modify Java/Spring Boot backend modules, CRUD APIs, entities, mappers, Biz classes, controllers, MyBatis-Plus code, validation, enums, dictionary fields, pagination endpoints, Excel import/export behavior, or MySQL/PostgreSQL DDL and version scripts.
+description: >
+  fa-admin backend development conventions for this repository.
+  在新增或修改 Java/Spring Boot 后端模块、CRUD API、实体类、Mapper、Biz 业务类、Controller、MyBatis-Plus 代码、数据校验、枚举、字典字段、分页接口、Excel 导入/导出逻辑，或 MySQL/PostgreSQL/Oracle DDL 及数据库版本脚本时使用。
 ---
 
 # FA Admin 后端
 
 ## 概览
 
-后端开发默认遵循本仓库“基类继承 + 薄 Controller”的风格。项目支持 MySQL（兼容现有 MySQL 5.7 语法）和 PostgreSQL 18；DDL、版本升级 SQL 与 Entity 字段必须先按目标数据库类型匹配对应规范。优先复用 `fa-core`、`fa-base` 已有抽象和相邻模块写法，不自行发明新的 API 形态、响应结构或表结构命名体系。
+1. 后端开发默认遵循本仓库“基类继承 + 薄 Controller”的风格。
+2. 项目支持 MySQL（兼容现有 MySQL 5.7 语法）和 PostgreSQL 18；DDL、版本升级 SQL 与 Entity 字段必须先按目标数据库类型匹配对应规范。
+3. 优先复用 `fa-core`、`fa-base` 已有抽象和相邻模块写法，不自行发明新的 API 形态、响应结构或表结构命名体系。
 
 ## 开始前
 
