@@ -1,98 +1,78 @@
 ---
 name: fa-admin-backend
 description: >
-  fa-admin backend development conventions for this repository.
-  在新增或修改 Java/Spring Boot 后端模块、CRUD API、实体类、Mapper、Biz 业务类、Controller、MyBatis-Plus 代码、数据校验、枚举、字典字段、分页接口、Excel 导入/导出逻辑，或 MySQL/PostgreSQL/Oracle DDL 及数据库版本脚本时使用。
+  FA Admin 框架后端开发规范。在基于 FA Admin 新增或修改 Java/Spring Boot 后端模块、CRUD API、实体类、Mapper、Biz 业务类、Controller、MyBatis-Plus 代码、数据校验、枚举、字典字段、分页接口、Excel 导入/导出逻辑，或 MySQL/PostgreSQL DDL 及数据库版本脚本时使用。适用于所有以 fa-core/fa-base 为基座的 FA Admin 业务项目。
 ---
 
 # FA Admin 后端
 
-## 概览
+以 `fa-core`/`fa-base` 为基座的后端，统一遵循"基类继承 + 薄 Controller"：优先复用框架已有抽象，不自行发明 API 形态、响应结构或表命名。
 
-1. 后端开发默认遵循本仓库“基类继承 + 薄 Controller”的风格。
-2. 项目支持 MySQL（兼容现有 MySQL 5.7 语法）和 PostgreSQL 18；DDL、版本升级 SQL 与 Entity 字段必须先按目标数据库类型匹配对应规范。
-3. 优先复用 `fa-core`、`fa-base` 已有抽象和相邻模块写法，不自行发明新的 API 形态、响应结构或表结构命名体系。
+## 执行顺序
 
-## 开始前
+1. **判任务类型**：普通 CRUD / 树形 CRUD / 自定义查询 / 纯 DDL / 集成与部署。
+2. **查路由表**：只读对应 reference，不一次性加载全部。
+3. **找相邻基线**：通用示例看 `fa-demo`，基类看 `fa-core`，风格看目标模块相邻代码；写 DDL 前先打开 `fa-base/src/main/resources/sql/fa-base/{mysql|postgre}/1.0.0_base_ddl.sql` 对表。
+4. **动手**：新建模块按下方 Playbook；单模块改动直接按对应 reference。
+5. **验证**：按文末清单最小检查，不跑全量构建。
 
-1. 修改前先查看最接近的现有模块。通用示例看 `fa-demo`，基类能力看 `fa-core`，具体风格看目标模块相邻代码。
-2. 先判断任务类型：普通 CRUD、树形 CRUD、自定义查询/业务逻辑，还是纯 DDL。
-3. 优先复用基础能力：`BaseController`、`BaseTreeController`、`BaseBiz`、`BaseTreeBiz`、`FaBaseMapper`、`QueryParams`、`Ret<T>`、`TableRet<T>`。
-4. 自定义业务逻辑优先放在 Biz 层。Controller 只做输入输出路由时保持轻薄，不要在子 Controller 里重复实现基类已有 CRUD 接口。
-5. 写 DDL 前先确定目标数据库类型：`mysql` 对应 MySQL，`postgre` 对应 PostgreSQL 18；再对比 `fa-base/src/main/resources/sql/fa-base/{数据库类型}` 下相似表，尤其是 `1.0.0_base_ddl.sql`，决定主键、审计字段、命名、索引和字段类型。
-6. 已支持模块新增或变更表结构时，分别提供 MySQL 与 PostgreSQL 的等价脚本；未支持某数据库类型的模块必须明确标注，绝不执行另一种数据库的 SQL 作为回退。
+## 技术基线
 
-## 后端 CRUD 分层
+| 项 | 基线 |
+| --- | --- |
+| JDK | 17 |
+| Servlet/校验包 | Jakarta EE（非 `javax.*`） |
+| MySQL | 兼容 5.7 语法 |
+| PostgreSQL | 18 |
+| Spring Boot / MyBatis-Plus / EasyExcel | 版本以父 POM/BOM 锁定为准，不擅自升级 |
+| Long 主键 | 序列化为字符串返回前端，前端 TS 用 `string` 承接 |
 
-标准业务对象使用四层结构：
+`fa-core/doc` 下的历史博客可能基于更旧版本，与基线或当前源码冲突时，一律以仓库源码和父 POM 为准。
 
-- `entity`：MyBatis-Plus 表映射、查询注解、树结构注解、Excel 注解、字典注解。
-- `mapper`：MyBatis Mapper，通常继承 `FaBaseMapper<Entity>`。
-- `biz`：普通表继承 `BaseBiz<Mapper, Entity>`；树形表继承 `BaseTreeBiz<Mapper, Entity>`。
-- `rest`：普通表继承 `BaseController<Biz, Entity, Key>`；树形表继承 `BaseTreeController<Biz, Entity, Key>`。
+## 硬性红线
 
-最小 Controller 形态：
+违反任意一条即视为错误，必须改正：
 
-```java
-@FaLogBiz("业务名称")
-@RestController
-@RequestMapping("/api/模块/业务/资源")
-public class XxxController extends BaseController<XxxBiz, Xxx, Integer> {
-}
-```
+- **升级 SQL** 禁止 `DROP TABLE`/`DROP SCHEMA`/`TRUNCATE`（执行器会拒绝）；已发布版本脚本不可改写。
+- **破坏性运维**：物理 `DELETE`、清库、`TRUNCATE`、删 submodule、打包/镜像发布/远程部署/systemctl stop，必须用户明确要求并确认环境后才做。
+- **双库一致**：变更表结构必须同时提供 `mysql` 与 `postgre` 等价脚本，禁止只写一种或回退到另一种方言。
+- **不重写基类**：子 Controller 不重复实现 `BaseController`/`BaseTreeController` 已有端点；自定义逻辑放 Biz 层。
+- **不发明契约**：响应只用 `Ret<T>`/`TableRet<T>`，路径用 `/api/大模块/业务/实体`，表/字段/审计列沿用框架命名。
+- **凭证隔离**：密钥、密码、私钥、token 用环境变量/密钥管理，不写进代码、SQL、Skill 或日志。
+- **类型对齐**：Java `Boolean` 在 MySQL 是 `tinyint(1)`、在 PG 是 `boolean`；关联外键列必须匹配被引用表真实主键类型。
 
-树形资源使用 `BaseTreeController<XxxBiz, Xxx, Key>`，并在实体上补充树形注解。`@RestController` 还是 `@Controller` 优先跟随同模块相邻 Controller。
+## Reference 路由
 
-## API 与响应
+| 任务 | 必读 reference |
+| --- | --- |
+| 新建模块/标准或树形 CRUD（Entity+Mapper+Biz+Controller） | [crud-api.md](references/crud-api.md)、[entity-enum-dict.md](references/entity-enum-dict.md)、[ddl.md](references/ddl.md) |
+| 纯 DDL、版本升级 SQL、菜单初始化 | [ddl.md](references/ddl.md) |
+| 自定义分页、联表查询、批量 upsert、JSON 字段、动态表/数据源、TDengine | [custom-logic.md](references/custom-logic.md) |
+| 枚举、字典、字段校验、Jackson 序列化 | [entity-enum-dict.md](references/entity-enum-dict.md) |
+| JetCache、Redis 分布式锁、线程池 | [cache-concurrency.md](references/cache-concurrency.md) |
+| Excel 导入/导出 | [excel.md](references/excel.md)（批量 upsert 同时看 [custom-logic.md](references/custom-logic.md)） |
+| Forest 外部 API、集合/Stream/反射、JWT | [java-integrations.md](references/java-integrations.md) |
+| SSE、WebSocket、MQTT、Kafka、站内信 | [messaging-realtime.md](references/messaging-realtime.md) |
+| 测试、代码生成器、Maven、打包、nginx、systemd/Windows 自启、运维 SQL | [testing-deployment.md](references/testing-deployment.md) |
 
-API 路径使用 `/api/大模块/业务模块/实体` 结构。已有基础分组包括 `/api/base/xxx` 核心接口、`/api/tenant/xxx` 多租户接口。
+## 新建模块 Playbook
 
-需求能被基类覆盖时直接复用基类端点。普通 `BaseController` 已提供 `/save`、`/update`、`/remove/{id}`、`/getById/{id}`、`/page`、`/list`、`/exportExcel`、`/importExcel` 以及批量、mine、永久删除等接口。`BaseTreeController` 额外提供树路径、当前层级、全树、子树、排序调整、上移、下移等接口。
+从零加一张业务表时严格按序，每步先查对应 reference：
 
-新增自定义接口时：
+1. **定库类型、找基线**：`mysql` 还是 `postgre`，对 `1.0.0_base_ddl.sql` 相邻表定主键、审计列、索引。→ [ddl.md](references/ddl.md)
+2. **写双份 DDL + 菜单**：`src/main/resources/sql/{模块编码}/{mysql|postgre}/{版本}*.sql` 各一份；菜单先按段位表选未占用 ID。→ [ddl.md](references/ddl.md)
+3. **写 Entity**：普通逻辑删除表继承 `BaseDelEntity`，`@TableName`/`@TableId`，Java 类型与 DDL 逐字段对齐；树形表补树注解。→ [entity-enum-dict.md](references/entity-enum-dict.md)
+4. **写 Mapper**：单表继承 `FaBaseMapper<Entity>`，不加方法；联表/聚合写 XML。→ [custom-logic.md](references/custom-logic.md)
+5. **写 Biz**：普通表 `BaseBiz<Mapper,Entity>`，树形 `BaseTreeBiz<Mapper,Entity>`；事务/批量/联表/缓存放这层。
+6. **写 Controller**：继承 `BaseController<Biz,Entity,Key>` 或 `BaseTreeController<...>`，类上 `@FaLogBiz`，尽量空类体。→ [crud-api.md](references/crud-api.md)
+7. **验证**：按下方清单逐项核对。
 
-- 查询请求体按场景使用 `QueryParams` 或 `BasePageQuery<ReqVo>`。
-- 返回 `Ret<T>` 或 `TableRet<T>`，Controller 中使用基类 `ok(...)` 返回成功结果。
-- 大结果/查询类接口加 `@LogNoRet`；基类未覆盖的操作按需加 `@FaLogOpr`。
-- 创建、更新等实体校验场景使用项目校验分组，例如 `Vg.Crud.C`、`Vg.Crud.U`。
+> 单表标准 CRUD 可用 `fa-generator` 生成后逐文件人工合入；树形/复杂联表直接手写。
 
-## DDL 与版本升级规则
+## 验证清单
 
-SQL 路径固定为 `src/main/resources/sql/{模块编码}/{数据库类型}/{版本}*.sql`；数据库类型目录仅使用 `mysql`、`postgre`。升级运行时由 JDBC 产品名自动选择目录，未知数据库类型失败，未提供当前类型脚本的业务模块只告警跳过，绝不回退执行另一种方言脚本。
-
-版本脚本文件名、`@@ver` 与 `@@info` 必须一致，按版本升序执行。已发布/已部署版本脚本不可改写；空库基线验证阶段仅在用户明确授权时才能修正基线。所有升级 SQL 执行前都会禁止 `DROP TABLE`、`DROP SCHEMA` 和 `TRUNCATE`，不得绕过该保护。默认不添加数据库外键约束。
-
-目标数据库类型决定 SQL 规范：
-
-| 对象 | MySQL (`mysql`) | PostgreSQL (`postgre`) |
-| --- | --- | --- |
-| 建表 | `CREATE TABLE IF NOT EXISTS` + `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4` | `CREATE TABLE IF NOT EXISTS`，不写 MySQL 表选项 |
-| 标识符 | 复用相邻脚本的反引号风格 | 复用相邻脚本的双引号风格，禁止反引号 |
-| 自增主键 | `AUTO_INCREMENT` | `GENERATED BY DEFAULT AS IDENTITY` |
-| 布尔字段 | `tinyint(1)`，SQL 值 `0/1` | `boolean`，SQL 值 `true/false` |
-| JSON | `json` | `jsonb` |
-| 更新时间 | 可使用 `ON UPDATE CURRENT_TIMESTAMP` | 使用触发器函数，禁止 `ON UPDATE CURRENT_TIMESTAMP` |
-| 幂等新增列 | 按 MySQL 版本能力和相邻脚本处理 | 优先 `ADD COLUMN IF NOT EXISTS` |
-| 初始化数据 | 按相邻脚本处理重复键 | 优先 `ON CONFLICT (...) DO NOTHING/UPDATE` |
-
-字段类型必须与 Entity 一致，特别是 Java `Boolean`/`boolean` 在 PostgreSQL 必须为 `boolean`，不能使用 `smallint`；MySQL 的布尔字段必须为 `tinyint(1)`。不要把所有新表主键强制改成一种类型：配置、字典、菜单、角色、日志类表常见整型 ID，用户、部门、文件等相关 ID 常见 `varchar(32)`；关联字段必须匹配目标表真实主键类型。
-
-普通业务表需要目标数据库对应的审计字段与逻辑删除字段 `deleted`。完整审计字段、类型映射、菜单 SQL 与版本脚本细则见 [references/ddl.md](references/ddl.md)。
-
-## 实体细节
-
-实体使用 `@TableName`、`@TableId`，普通逻辑删除业务表通常继承 `BaseDelEntity`。只有需要参与通用查询解析的字段才添加 `@SqlEquals` 等查询注解。
-
-字典字段使用 `@FaColDict("dict_code")`；`BaseController.page`/`BaseBiz.selectPageByQuery` 会把字典数据返回给前端。Excel 字段沿用现有 EasyExcel 注解和工具类。
-
-枚举字段在实体中直接声明为枚举类型，不要为了方便退化成 `Integer`，除非是在匹配历史设计。详见 [references/entity-enum-dict.md](references/entity-enum-dict.md)。
-
-## 自定义查询与批量逻辑
-
-非标准分页使用 PageHelper 配合 `BasePageQuery<ReqVo>`，返回 `new TableRet<>(info)`。导入或批量 upsert 逻辑应先一次性查询已有数据，按业务 key 建立 Map，再拆分 `saveBatch` 和 `updateBatchById`。
-
-分页、自定义批量逻辑、MyBatis-Plus JSON 字段、动态表后缀、强制更新 null、Excel 分页导出等细节见 [references/custom-logic.md](references/custom-logic.md)。
-
-## 验证
-
-完成后运行最小必要检查：可行时编译目标模块，有测试则运行相关测试；至少检查生成代码的 import、泛型 Key 类型、路径和基类继承是否一致。纯 DDL 修改要确认目标数据库方言兼容性（MySQL 5.7 或 PostgreSQL 18）、Entity 类型映射、升级脚本安全约束，并和同数据库类型相邻脚本对比命名、索引与字段风格。
+- **DDL**：目标方言正确（MySQL 反引号/PG 双引号）、双份齐全、布尔/JSON/自增类型对、无 `DROP`/`TRUNCATE`、菜单 ID 已查重、审计列与 `deleted` 齐全。
+- **Entity**：继承正确基类、`@TableName`/`@TableId` 齐全、泛型 `Key` 与主键 DDL 类型一致、枚举未退化成 `Integer`、JSON 字段带 `autoResultMap`。
+- **Mapper/Biz/Controller**：基类正确、无重复基类端点、`@FaLogBiz`、请求路径 `/api/...` 规范、`Ret`/`TableRet` 返回类型正确。
+- **编译**：目标模块编译通过，无未用 import；有相关测试则运行，否则不跑全量。
+- **安全**：无硬编码凭证、日志不含 token/完整个人数据、`@InterceptorIgnore` 仅限确需绕过的单方法。

@@ -86,7 +86,7 @@ private Date planProdDate;
 ```java
 BaseContextHandler.setTableSuffix("1");
 try {
-    return iotDeviceBiz.getById(id);
+    return xxxBiz.getById(id);
 } finally {
     BaseContextHandler.setTableSuffix("");
 }

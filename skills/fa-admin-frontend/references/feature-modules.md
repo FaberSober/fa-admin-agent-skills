@@ -1,6 +1,6 @@
 # Feature 模块组织
 
-结合当前 `frontend/apps/admin/features` 结构整理；优先参考 `fa-ai-pages`、`fa-vision-pages` 和目标模块相邻 feature。
+结合当前 `frontend/apps/admin/features` 结构整理；通用示例优先参考 `fa-admin-demo-pages`，业务写法以目标模块相邻 feature 为准。
 
 ## 目录职责
 
@@ -20,7 +20,7 @@
 - `helper/`、`select/`：页面专用选择器或辅助组件。
 - `tabs/`：详情页标签内容。
 
-不要引用已经不存在的 `fa-app-pages`。创建前使用 `find frontend/apps/admin/features -maxdepth 1` 确认当前模块命名和布局。
+创建前使用 `find frontend/apps/admin/features -maxdepth 1` 确认当前模块命名和布局。
 
 ## Configs
 

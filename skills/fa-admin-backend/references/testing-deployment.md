@@ -107,6 +107,35 @@ Windows 环境可选择启动目录中的 bat/vbs，或使用 WinSW 注册服务
 
 不要把历史示例的个人路径、内存参数或固定延迟直接用于目标机器。
 
+## Linux 服务化
+
+Linux 生产环境二选一管理同一 JAR，**不要两种方式同时跑**，否则端口冲突、重复进程：
+
+- 生产推荐 **systemd**：开机自启、崩溃自动重启、日志走 journal。
+- 临时/脚本环境用 `service.sh`（`nohup` + PID 文件）：`sh service.sh start|stop|restart|status`。
+
+systemd 关键规则：
+
+- unit 文件放 `/etc/systemd/system/fa-admin.service`，`ExecStart` 必须用绝对路径（不经过 shell 解析），Java 路径和 JAR 路径按目标机实际值写。
+- 敏感配置（私钥文件、授权码、token）放 `/etc/fa-xxx/xxx.env`，权限 `chmod 600`，unit 里用 `EnvironmentFile=` 引用；**不要把密钥内容写进 unit 或提交 Git**。Spring Boot 直接以 `${ENV_VAR:}` 占位读取。
+- 典型 unit 片段：
+
+```ini
+[Service]
+Type=simple
+User=www
+WorkingDirectory=/opt/fa-admin
+EnvironmentFile=/etc/fa-admin/fa-admin.env
+ExecStart=/usr/local/java/jdk-17/bin/java -jar /opt/fa-admin/fa-admin.jar --spring.profiles.active=prod
+Restart=on-failure
+RestartSec=5
+SuccessExitStatus=143
+```
+
+- 改 unit 或 env 后必须 `systemctl daemon-reload && systemctl restart fa-admin`。
+- 看日志用 `journalctl -u fa-admin -f` / `-n 100`；服务反复重启先查 JDK 路径、JAR、配置文件和目录权限。
+- 更新 JAR：`systemctl stop` → 替换 JAR → `systemctl start`，不要热替换运行中的文件。
+
 ## 运维 SQL
 
 `TRUNCATE`、物理 `DELETE` 和清理逻辑删除数据均为破坏性操作。只有用户明确要求、确认环境/库/表并具备备份或恢复方案后才执行。

@@ -32,6 +32,19 @@ COMMENT ON TABLE "table_name" IS '中文表注释';
 
 维护已有 `utf8` 老表时，除非任务明确要求字符集迁移，否则保留现有风格，不主动统一改造。
 
+## 数据库初始化与主键策略
+
+版本 SQL 由框架自动初始化执行，入口是 `com.faber.api.base.admin.biz.SystemUpdateLogBiz.initDb()`，按版本升序跑模块 `sql/{类型}/{版本}*.sql`。每个模块如何登记自己的版本 SQL，参考 `com.faber.api.base.demo.FaDemoDbInit`。
+
+主键选型直接影响前后端契约：
+
+- 选 `bigint` + 自增主键时，Java 侧是 `Long`，框架默认把 Long 序列化为字符串返回前端，前端 TS 也按 `string` 承接；将来要换成 UUID，只需把后端字段改 `String`、ID 生成逻辑改 UUID，前端 `string` 类型不动。
+- 选 `int`/`int unsigned` 自增主键时，Java 侧是 `Integer`，多见于配置、字典、菜单、角色、日志等低并发系统表。
+- 选 `varchar(32)` 主键时多见于用户、部门、文件、租户等表，通常用 UUID/雪花字符串。
+- 不要为了"统一"把所有新表主键都改成同一类型；关联外键列必须与被引用表真实主键类型一致。
+
+整型宽度按需选：`bigint` 8 字节、`int` 4 字节、`smallint` 2 字节、`tinyint` 1 字节；枚举/标志位常用 `tinyint`。
+
 ## 审计字段与字段类型
 
 需要完整审计信息的普通业务表，字段名保持一致，但类型与更新时间机制必须匹配数据库类型。
@@ -109,7 +122,19 @@ PostgreSQL 不能以 `smallint` 存储 Java `Boolean`；否则查询或写入布
 
 ## 菜单 SQL
 
-为前端页面生成菜单数据时，先参考目标数据库目录下的 `fa-base/src/main/resources/sql/fa-base/{mysql|postgre}/1.0.0_base_ddl.sql` 中 `base_rbac_menu` 的字段顺序和“首页”菜单记录。默认字段顺序保持：
+菜单 ID 是 8 位数字，按 `aa.bb.cc.dd` 四段分配：`aa`=顶部业务模块，`bb`=二级模块，`cc`=菜单，`dd`=功能点。框架内置模块占用的段位如下，新业务模块必须另选未占用的 `aa` 段，并先在目标库 `base_rbac_menu` 查重：
+
+| 段位 | 模块 | 说明 |
+| --- | --- | --- |
+| `1x.00.00.00` | fa-base | 框架基础模块（菜单、字典、角色、用户、日志等） |
+| `20.00.00.00` | fa-demo | 框架演示模块 |
+| `21.00.00.00` | fa-app | APP 模块 |
+| `22.00.00.00` | fa-disk | 网盘模块 |
+| `26.00.00.00` | fa-tenant | 多租户模块 |
+
+其余段位由各业务项目自行分配，不要与上表冲突；挂载前务必在目标库 `SELECT id FROM base_rbac_menu` 确认段位未被占用。
+
+为前端页面生成菜单数据时，先参考目标数据库目录下的 `fa-base/src/main/resources/sql/fa-base/{mysql|postgre}/1.0.0_base_ddl.sql` 中 `base_rbac_menu` 的字段顺序和"首页"菜单记录。默认字段顺序保持：
 
 ```sql
 id, parent_id, name, sort, level, icon, status, link_type, link_url,
@@ -121,12 +146,12 @@ crt_time, crt_user, crt_name, crt_host, upd_time, upd_user, upd_name, upd_host, 
 - 先确认挂载父菜单，例如“首页”通常为 `10000000`。
 - 检查同父级已有段位，例如 `10010000`、`10020000` 是否已被使用，再选择未占用的新段位。
 - 子菜单 ID 使用父级段位递增，例如模块 `10030000`，分组 `10030100`，页面 `10030101`。
-- `link_url` 必须与前端页面目录路径一致，例如 `pages/admin/hqd/permit/licenseApplication/index.tsx` 对应 `/admin/hqd/permit/licenseApplication`。
+- `link_url` 必须与前端页面目录路径一致，例如 `pages/admin/biz/order/list/index.tsx` 对应 `/admin/biz/order/list`。
 
 菜单层级按页面复杂度生成：
 
 - 顶层业务入口挂到指定父菜单下，`level` 通常为 `1`。
-- 业务分组作为中间菜单，例如“事前许可”“事中称重”。
+- 业务分组作为中间菜单，例如"订单管理""统计报表"。
 - 具体页面作为叶子菜单，名称使用页面业务名。
 - 按同级显示顺序设置 `sort`，从 `0` 开始递增。
 - 图标仅给业务入口或分组配置；叶子菜单没有明确需求时使用 `NULL`。

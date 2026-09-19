@@ -52,7 +52,7 @@ try (ExcelWriter writer = EasyExcel.write(fileName, RbacMenu.class).build()) {
 - 更新时哪些字段允许覆盖，哪些数据库字段必须保留。
 - 数据量上限、事务范围和失败回滚策略。
 
-批量写入慢时确认 JDBC 是否启用 `rewriteBatchedStatements=true`，并检查实际 SQL/批次，而不是盲目增加批次大小。
+批量写入慢的排查（JDBC `rewriteBatchedStatements`、批次大小、实际 SQL）见 [custom-logic.md](custom-logic.md) 的批量写入节。
 
 ## 验证
 
