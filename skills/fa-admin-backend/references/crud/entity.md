@@ -8,8 +8,9 @@
 
 ## 注解
 
+- 类上加 `@FaModalName("中文名")`（后台弹窗标题）。
 - `@TableName("table_name")`；JSON type handler 场景加 `autoResultMap = true`。
-- `@TableId` 指定主键，主键类型同时匹配 DDL、Mapper/Biz、Controller 泛型。
+- `@TableId(type = IdType.AUTO)` 指定主键，主键类型同时匹配 DDL、Mapper/Biz、Controller 泛型。
 - 只有参与通用查询解析的字段才加 `@SqlEquals`。
 - 字典字段用 `@FaColDict("dict_code")`，见 [data/dict.md](../data/dict.md)。
 - Excel 字段按相邻实体加 EasyExcel 注解，见 [excel/excel.md](../excel/excel.md)。

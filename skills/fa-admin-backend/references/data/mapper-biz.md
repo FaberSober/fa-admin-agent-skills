@@ -1,5 +1,11 @@
 # Mapper 与 Biz
 
+## 基类
+
+- `Mapper`：`extends FaBaseMapper<Entity>`。
+- `Biz`：`@Service`，`extends BaseBiz<Mapper, Entity>`；树形用 `BaseTreeBiz<Mapper, Entity>`。
+- 事务用 `@Transactional(rollbackFor = Exception.class)`，业务异常抛 `BuzzException`。
+
 ## 自定义分页
 
 基类 `/page` 不满足联表、聚合或 VO 查询时，用 `BasePageQuery<ReqVo>` + PageHelper + Mapper：
@@ -34,45 +40,8 @@ public TableRet<StoreFile> queryFilePage(BasePageQuery<StoreFileQueryVo> query) 
 2. 按业务 key 一次性查已有数据，构造 `Map<Key, Entity>`。
 3. 拆成新增和更新集合；更新时保留主键和不应覆盖字段。
 4. 分别 `saveBatch(...)` 和 `updateBatchById(...)`，按数据量分块。
-5. 需要原子性时在 Biz 方法加项目事务注解。
 
-批量插入慢时检查 MySQL JDBC URL 的 `rewriteBatchedStatements=true`，不要在每个 Mapper 重复写批量 SQL。Excel 导入见 [../excel/excel.md](../excel/excel.md)。
-
-## MyBatis-Plus JSON 字段
-
-`@TableName` 加 `autoResultMap = true`，字段用 `UniversalJsonTypeHandler`：
-
-```java
-@TableName(value = "demo_student", autoResultMap = true)
-public class Student extends BaseDelEntity {
-    @TableField(typeHandler = UniversalJsonTypeHandler.class)
-    private Tag[] tags;
-}
-```
-
-## 强制更新 null
-
-默认 MyBatis-Plus 忽略 null。只有业务明确要求清空列时：
-
-```java
-@TableField(updateStrategy = FieldStrategy.ALWAYS)
-private Date planProdDate;
-```
-
-先评估对所有更新入口的影响；只影响单次更新时优先用显式 UpdateWrapper。
-
-## 拦截器忽略
-
-确需绕过保护时才用 `@InterceptorIgnore`，并精确指定单项：
-
-```java
-public interface StudentMapper extends FaBaseMapper<Student> {
-    @InterceptorIgnore(blockAttack = "true")
-    int deleteAll();
-}
-```
-
-绕过租户、全表更新/删除属于高风险，必须检查调用入口和数据范围。
+MySQL JDBC 批量配置、JSON 字段、拦截器忽略见 [mybatisplus.md](mybatisplus.md)。
 
 ## 动态表名、动态数据源、TDengine
 

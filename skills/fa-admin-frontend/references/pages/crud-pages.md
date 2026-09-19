@@ -38,7 +38,7 @@ export default new Api(GATE_APP.demo, 'student');
 
 ## 列表页
 
-页面使用函数组件，通过 `useTableQueryParams<Entity>(api.page, initParams, serviceName)` 管理分页、排序、查询、场景和字典：
+页面使用函数组件，通过 `useTableQueryParams<Entity>(api.page, initParams, serviceName, options?)` 管理分页、排序、查询、场景和字典：
 
 ```ts
 const {
@@ -52,14 +52,18 @@ const {
   list,
   dicts,
   paginationProps,
-} = useTableQueryParams<Entity>(api.page, {}, serviceName);
+} = useTableQueryParams<Admin.Alert>(api.page, {}, serviceName, {
+  onAfterGetPage: () => dispatch({ type: '@@api/refresh_xxx' }),
+});
 ```
 
-- 删除使用 `useDelete<Key>(api.remove, fetchPageList, serviceName)`。
-- 导出使用 `useExport(api.exportExcel, queryParams)`。
-- 表格使用 `BaseBizTable`，列定义封装为 `genColumns()`。
-- 查询提交调用 `setFormValues`；重置使用 `clearForm(form)`。
-- 批量删除、组合查询和场景能力只有页面需要时才传入。
+- 删除：`const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)`。
+- 导出：`const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams)`。
+- 表格用 `BaseBizTable`，列定义封装为 `genColumns()`。
+- 查询提交 `setFormValues`；重置 `clearForm(form)`。
+- 批量删除传 `batchDelete={(ids) => api.removeBatchByIds(ids)}`。
+- 操作列用 `AuthDelBtn` 包裹删除按钮。
+- 列生成器优先用 `BaseTableUtils.genIdColumn/genSimpleSorterColumn/genEnumSorterColumn/genDateSorterColumn/genBoolSorterColumn/genCtrColumns/genUpdateColumns`。
 - 具体表格、查询字段和选择器规范见 [table.md](table.md)。
 
 ## 弹窗
@@ -87,8 +91,8 @@ const loading = useApiLoading([
 
 常见列表页外层：
 
-- 页面：`fa-content fa-full fa-flex-column`
-- 查询/标题头部：`fa-flex-row-center fa-p8`
+- 页面：`fa-full-content-p12 fa-flex-column fa-gap12`
+- 查询表单区：`fa-bg-white fa-flex-column fa-flex-1`，表单区 padding 12
 - 弹窗表单：`fa-grid2 fa-mt12` 配合 `FaUtils.formItemHalfLayout`
 
 列表页只组合查询、表格和弹窗。请求逻辑放 services，可复用 UI 放 components/helper，类型放 types，数据转换放初始化或提交函数。不要在页面内重复实现通用分页、删除、上传、loading 或 URL 处理。

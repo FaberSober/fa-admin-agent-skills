@@ -47,6 +47,7 @@ public class XxxController extends BaseController<XxxBiz, Xxx, Integer> {
 | removePerBatchByIds | POST `/removePerBatchByIds` | 批量物理删除 |
 | removeByQuery | POST `/removeByQuery` | 按条件删除 |
 | removeMine | DELETE `/removeMine` | 删当前用户数据 |
+| removeMineByQuery | POST `/removeMineByQuery` | 按条件删当前用户数据 |
 | all | GET `/all` | 全部列表 |
 | list | POST `/list` | 条件列表 |
 | listN | POST `/listN?topN=` | 前 N 条 |
