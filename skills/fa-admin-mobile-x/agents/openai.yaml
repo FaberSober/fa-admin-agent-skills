@@ -1,0 +1,4 @@
+interface:
+  display_name: "FA Admin MobileX"
+  short_description: "FA Admin uni-app X 页面、组件、主题与框架文档规范"
+  default_prompt: "使用 $fa-admin-mobile-x 按现有框架规范开发或维护 uni-app X 移动端，并按需更新相关文档。"

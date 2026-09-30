@@ -8,6 +8,10 @@
     {
       "name": "fa-admin-frontend",
       "path": "skills/fa-admin-frontend"
+    },
+    {
+      "name": "fa-admin-mobile-x",
+      "path": "skills/fa-admin-mobile-x"
     }
   ]
 }
