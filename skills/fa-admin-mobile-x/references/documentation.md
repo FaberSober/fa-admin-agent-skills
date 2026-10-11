@@ -56,8 +56,11 @@
 | `coding.md` | `coding.md` |
 | `feature-modules.md` | `feature-modules.md` |
 | `theme.md` | `theme.md` |
+| `page-data-loading.md` | `page-data-loading.md` |
 | `components/button.md` | `components/button.md` |
+| `components/card.md` | `components/card.md` |
 | `components/dialog.md` | `components/dialog.md` |
 | `components/icon.md` | `components/icon.md` |
+| `components/loading.md` | `components/loading.md` |
 
 `docs/README.md` 是文档总览，`docs/development/README.md` 是开发文档索引，两者不分发。副本与维护源正文保持一致；新增分发主题时更新此表及 skill 导航，不复制计划和 ADR。发布前核对副本与维护源、检查文档链接，再在 skill 源仓库运行 `npm run package:check`。沿用源仓库发布流程，不因文档更新自动发布包。

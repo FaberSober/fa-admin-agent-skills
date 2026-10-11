@@ -22,14 +22,19 @@ description: >
 | UTS、事件、样式、配置、验证 | [编码约定](references/coding.md) |
 | 新增模块、页面、依赖或入口 | [Feature 与路由](references/feature-modules.md) |
 | 主题存储、页面和导航栏配色 | [主题约定](references/theme.md) |
-| 原生按钮类型、样式与状态 | [按钮约定](references/components/button.md) |
+| FaButton 参数、主题、禁用/加载状态与原生按钮约定 | [按钮约定](references/components/button.md) |
+| 卡片边框、背景、圆角、主题与选中态 | [卡片约定](references/components/card.md) |
 | 页面内确认或危险操作弹窗 | [弹窗示例](references/components/dialog.md) |
 | FaIcon 参数、语义名称与回退 | [图标组件](references/components/icon.md) |
 
 ## 关键边界
 
 - 文档中的源码路径相对移动端项目根目录；导入片段按标注目录调整，先核对当地实现。
-- 当前有共享 `FaIcon`，按钮使用原生 `<button>`，dialog 是页面内实现；不要编造 `FaButton`、`FaDialog` 导入或接口。
+- 当前有共享 `FaIcon`、`FaButton`。新增普通操作按钮优先复用 `features/fa-core-mobile/components/fa-button.uvue`；传入 `text`、`dark` 和业务状态，使用 `@press`。组件内部保留原生按钮并统一处理主题、禁用和 loading；间距与布局由外层容器控制。
+- 旧项目使用前先核对是否已有 `FaButton`；未提供组件或需要特殊表情/图标按钮时，沿用当地原生 `<button>` 和共享样式工具。原生禁用颜色会覆盖 class，使用 `getButtonDisabledStyle` 绑定内联样式，不能仅添加暗色 class。具体参数与验证命令见按钮约定。
+- dialog 的页面示例不能当成共享组件；导入其他弹窗组件前先核对当地实现，不编造接口。
+- 普通内容、列表、入口和确认卡片使用 `fa-card` 宿主及首个子节点 `fa-card-surface` / `fa-card-fill` 背景结构。基础样式只在 `features/fa-core-mobile/styles/cards.css` 维护，圆角只有一处声明；页面只定义尺寸、间距和内容布局，不重复设置卡片背景、边框、圆角或用 `overflow: hidden` 裁剪。
+- 卡片边框用外层背景色绘制，填充层四边显式内缩；不要改回同一元素叠加原生 border 与背景。自定义组件内须导入公共卡片 CSS，避免样式隔离造成无背景。明暗主题和选中状态绑定到背景层，参考统一卡片 Demo；修改后运行 `node scripts/check-cards.mjs`，原生效果仍需目标端验证。旧项目先核对当地实现。
 - 触摸交互使用 `@tap`；只用目标 uni-app X 编译器支持的属性和 CSS，不直接套用 DOM/React 写法。
 - 不手改 `pages.json`、`features/generated/feature-registry.json`，不提交本机凭据和生成资源。
 - `references/` 来自框架维护源；冲突时以当地代码为准并修正文档。无源码时不要把副本当作平台验证证据。
