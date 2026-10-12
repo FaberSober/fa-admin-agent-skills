@@ -1,6 +1,6 @@
 {
   "name": "@fa-admin/agent-skills",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Shared AI agent skills for FA Admin projects",
   "type": "module",
   "license": "MIT",
