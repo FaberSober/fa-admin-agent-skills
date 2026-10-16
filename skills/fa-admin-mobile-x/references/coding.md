@@ -5,7 +5,7 @@
 ## 工程与复用
 
 - 页面和组件使用 `.uvue`，逻辑模块使用 `.uts`；页面脚本沿用 `<script setup lang="uts">`。
-- 业务放入 `features/<模块>/`，按需建立 `pages/`、`api/`、`common/`、`components/`。共享配置、主题、图标等能力优先复用 `fa-core-mobile`，基础业务沿用 `fa-base-mobile`。
+- 业务放入 `features/<模块>/`，按需建立 `pages/`、`api/`、`common/`、`components/`。共享配置与主题复用 `fa-core-mobile`，通用按钮、图标和卡片复用 `fa-ui-mobile`，基础业务沿用 `fa-base-mobile`。
 - 先查相邻实现和 demo，确认能力是共享组件还是页面代码；不要创建已有能力的第二份封装。
 - 沿用相邻代码的相对导入方式，并按实际目录深度调整；不要照搬 React 的包导入或普通 uni-app 的类型假设。
 - 页面登记与模块依赖见 [Feature 模块](feature-modules.md)，主题见 [主题约定](theme.md)。

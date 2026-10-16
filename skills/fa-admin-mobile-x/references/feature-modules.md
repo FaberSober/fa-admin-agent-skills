@@ -37,7 +37,7 @@
 
 页面路由仍需在编译前写入 `pages.json`。监听器扫描 `features/` 下带有 `feature.json` 的模块目录，并自动调用生成脚本更新路由和入口，无需逐次手动运行生成器或维护 `pages.json`。单次生成或 CI 场景运行 `pnpm generate:pages`。监听器使用 Chokidar 统一处理跨平台文件事件，用 `Ctrl+C` 停止。
 
-`fa-base-mobile` 提供启动页并保持为必需模块；它依赖共享模块 `fa-core-mobile`。删除一个仍被其他模块依赖的目录时，生成脚本会报出缺失依赖。Feature 的页面需要通过其模块清单登记，页面文件本身不会自动成为路由。
+`fa-base-mobile` 提供启动页并保持为必需模块；它依赖共享模块 `fa-core-mobile`、`fa-ui-mobile`。UI 模块提供 FaCard / FaButton / FaIcon，`dependsOn` 和 `pages` 均为空，不反向引用 core/base/业务；core 及实际 UI 消费者在各自清单中声明 UI 依赖。删除一个仍被其他模块依赖的目录时，生成脚本会报出缺失依赖。Feature 的页面需要通过其模块清单登记，页面文件本身不会自动成为路由。
 
 ## 生成文件与跳转
 

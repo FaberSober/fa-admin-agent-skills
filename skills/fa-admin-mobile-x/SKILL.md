@@ -30,7 +30,7 @@ description: >
 ## 关键边界
 
 - 文档中的源码路径相对移动端项目根目录；导入片段按标注目录调整，先核对当地实现。
-- 当前有共享 `FaIcon`、`FaButton`。新增普通操作按钮优先复用 `features/fa-core-mobile/components/fa-button.uvue`；传入 `text`、`dark` 和业务状态，使用 `@press`。组件内部保留原生按钮并统一处理主题、禁用和 loading；间距与布局由外层容器控制。
+- 通用 UI 由独立 `features/fa-ui-mobile/` 提供，消费者声明对应 Feature 依赖；UI 不反向导入 core/base/业务模块。新增普通操作按钮优先复用 `components/fa-button.uvue`（FaButton），语义图标复用 `components/fa-icon.uvue`（FaIcon，依赖工程现有 uni-icons）。FaButton 传入 `text`、`dark` 和业务状态，使用 `@press`；内部保留原生按钮并统一处理主题、禁用和 loading，间距与布局由外层容器控制。纯按钮/图标工具位于 UI 的 `common/`，公共样式位于 `styles/`；core 旧按钮 CSS 仅转引。
 - 旧项目使用前先核对是否已有 `FaButton`；未提供组件或需要特殊表情/图标按钮时，沿用当地原生 `<button>` 和共享样式工具。原生禁用颜色会覆盖 class，使用 `getButtonDisabledStyle` 绑定内联样式，不能仅添加暗色 class。具体参数与验证命令见按钮约定。
 - dialog 的页面示例不能当成共享组件；导入其他弹窗组件前先核对当地实现，不编造接口。
 - 新增普通内容、列表、入口和确认卡片优先复用 `features/fa-ui-mobile/components/fa-card.uvue`（FaCard），支持显式 `dark`、`active`、`padding`（normal/small/none）、默认插槽和 `@press`。内部控件需阻止 tap 冒泡；间距和尺寸放外层容器，插槽文字主题由调用方管理。消费者声明 UI Feature 依赖；旧项目先核对是否已有组件。

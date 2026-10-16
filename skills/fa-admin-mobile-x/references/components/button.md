@@ -1,10 +1,12 @@
 # 按钮使用约定
 
-分类：共享组件与原生组件使用约定。共享组件：`features/fa-core-mobile/components/fa-button.uvue`，示例为请求 Loading 与下拉刷新 Demo。公共样式：`features/fa-core-mobile/styles/buttons.css`。已有原生按钮可继续使用 `fa-button` 基础类及共享工具。
+分类：共享组件与原生组件使用约定。共享组件：`features/fa-ui-mobile/components/fa-button.uvue`，示例为按钮、请求 Loading 与下拉刷新 Demo。公共样式：`features/fa-ui-mobile/styles/buttons.css`；core 旧样式路径仅转引。已有原生按钮可继续使用 `fa-button` 基础类及共享工具。
 
 ## 统一 FaButton
 
 新增普通操作按钮优先使用 `FaButton`，组件内部保留原生 `<button>`，导入公共样式并通过内联样式处理主题和禁用颜色。页面只负责外层布局和业务状态。
+
+消费者在 `feature.json.dependsOn` 声明 `fa-ui-mobile`。组件、工具和样式已迁入 UI 模块，旧 core 组件/工具路径不再提供实现；UI 不读取主题存储或业务状态，现有参数、事件和配色保持不变。
 
 ```vue
 <fa-button text="刷新资料" :dark="themeMode === 'dark'" :disabled="busy" @press="refreshProfile" />
@@ -12,7 +14,7 @@
 ```
 
 ```uts
-import FaButton from '@/features/fa-core-mobile/components/fa-button.uvue'
+import FaButton from '@/features/fa-ui-mobile/components/fa-button.uvue'
 ```
 
 | 参数 | 类型 | 必填 / 默认值 | 说明 |
@@ -30,7 +32,7 @@ import FaButton from '@/features/fa-core-mobile/components/fa-button.uvue'
 
 所有类型的禁用态复用 `getButtonDisabledStyle`：暗色背景 `#1b2434`、边框 `#2b3648`、文字 `#8290a6`；亮色使用对应浅色禁用配色。主题或状态改变时自动重算，恢复后回到对应类型的配色。业务仍需保留防重复提交逻辑；特殊表情、图标按钮继续使用下方原生按钮约定。
 
-验证：`node scripts/check-fa-button.mjs` 检查主题切换、禁用与恢复、loading 防重复点击、单次事件和尺寸。2026-10-11 已通过该检查、请求 Loading Demo 检查及原生按钮检查；未执行本次 Android/iOS 原生编译或真机验证。
+验证：`pnpm check --group core --name check-fa-button.mjs` 检查主题切换、禁用与恢复、loading 防重复点击、单次事件和尺寸。2026-10-11 已通过该检查、请求 Loading Demo 检查及原生按钮检查；未执行本次 Android/iOS 原生编译或真机验证。
 
 ## 最小用法
 
@@ -69,10 +71,10 @@ import FaButton from '@/features/fa-core-mobile/components/fa-button.uvue'
 
 ### 禁用态与主题
 
-共享工具 `features/fa-core-mobile/common/button.uts` 导出 `getButtonDisabledStyle(dark: boolean, disabled: boolean, transparent: boolean = false): UTSJSONObject`，绑定到按钮的 `:style`。普通按钮禁用时返回对应主题的背景、边框及文字色，启用时返回空对象；透明按钮始终返回透明背景/边框，并以 `opacity` 区分禁用和启用，避免原生禁用态出现白底。
+共享工具 `features/fa-ui-mobile/common/button.uts` 导出 `getButtonDisabledStyle(dark: boolean, disabled: boolean, transparent: boolean = false): UTSJSONObject`，绑定到按钮的 `:style`。普通按钮禁用时返回对应主题的背景、边框及文字色，启用时返回空对象；透明按钮始终返回透明背景/边框，并以 `opacity` 区分禁用和启用，避免原生禁用态出现白底。
 
 ```uts
-import { getButtonDisabledStyle } from '@/features/fa-core-mobile/common/button.uts'
+import { getButtonDisabledStyle } from '@/features/fa-ui-mobile/common/button.uts'
 const disabledStyle = computed((): UTSJSONObject => getButtonDisabledStyle(dark.value, sending.value))
 const emojiStyle = computed((): UTSJSONObject => getButtonDisabledStyle(dark.value, sending.value, true))
 ```
@@ -85,7 +87,9 @@ const emojiStyle = computed((): UTSJSONObject => getButtonDisabledStyle(dark.val
 
 ## 验证
 
-运行 `node scripts/check-buttons.mjs`，检查 `features/` 下所有原生按钮是否使用公共类、是否重复声明 class 或包含嵌套元素、是否重新加入纵向内边距及是否同时设置自定义高度和行高。该检查不代表文字已在设备上居中。
+2026-10-17 UI01B：FaButton、纯按钮工具和公共样式迁入独立 UI Feature，按钮 Demo 增加组件类型、尺寸、禁用/加载切换、点击计数及不持久化的明暗预览。按钮逻辑、原生按钮、图标及卡片/依赖检查通过；HBuilderV 配套 SDK CLI `5.31.2026100911-alpha` Android 资源编译及导出通过，完整日志无 warning/error。用户确认本批人工验证通过，UI01B 状态为 ✅已完成，未单独注明验收平台；本次自动化未构建 APK、未运行设备、未编译 iOS。
+
+运行 `pnpm check --group core --name check-buttons.mjs`，检查 `features/` 下所有原生按钮是否使用公共类、是否重复声明 class 或包含嵌套元素、是否重新加入纵向内边距及是否同时设置自定义高度和行高。该检查不代表文字已在设备上居中。
 
 本次公共样式已接入基础业务与 Demo 的 49 个原生按钮，静态检查及 HBuilderX 5.26 Android/iOS Vapor 资源编译通过；端侧文字居中、点击、禁用、加载及亮暗主题仍需真机验收。
 

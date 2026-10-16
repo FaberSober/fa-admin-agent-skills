@@ -31,7 +31,7 @@
 - 事件：`press`，无参数；根节点使用 `@tap.stop`，每次点击派发一次，并阻止继续冒泡至外层卡片。内部交互控件需使用 `@tap.stop`（FaButton 已处理），避免同时触发卡片操作。
 - 插槽：默认插槽，放置内容；不额外增加内容容器。文字颜色由调用方根据 `dark` 管理。
 - 卡片尺寸和外部间距放外层容器，内部基础样式由组件维护；无禁用、加载或自动主题接口。
-- UI 模块的 `dependsOn` 和 `pages` 均为空，不导入 core/base/业务模块。FaButton、FaIcon 本批仍在 core，尚未迁移。
+- UI 模块的 `dependsOn` 和 `pages` 均为空，不导入 core/base/业务模块；FaCard、FaButton、FaIcon 均由此模块提供。
 
 ## 兼容已有页面的样式结构
 
