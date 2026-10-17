@@ -54,6 +54,7 @@
 | --- | --- |
 | `documentation.md` | `documentation.md` |
 | `coding.md` | `coding.md` |
+| `ui-components.md` | `ui-components.md` |
 | `feature-modules.md` | `feature-modules.md` |
 | `theme.md` | `theme.md` |
 | `page-data-loading.md` | `page-data-loading.md` |
