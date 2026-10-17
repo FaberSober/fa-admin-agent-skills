@@ -35,6 +35,7 @@ description: >
 
 - 文档中的源码路径相对移动端项目根目录；导入片段按标注目录调整，先核对当地实现。
 - 新增 UI 先查组件目录和相邻调用，再选择现有组件；只在接口确实不能覆盖时扩展。四个迁移试点的复用规则及例外由目录文档和 `check-ui-reuse.mjs` 维护，不对全部历史页面强制替换；新增导入或试点同步维护检查与最小示例。
+- 框架通过 `pages.config.json.easycom.custom` 统一注册八个 UI 组件，模板可直接使用 Fa 标签而无需逐项 import；应用级组件保持显式导入。旧项目先核对当地配置，未配置时仍使用实际组件路径。映射修改后运行页面生成器，不手改 pages.json；保留 uni-icons 等原有自动发现能力。
 - 通用 UI 由独立 `features/fa-ui-mobile/` 提供，消费者声明对应 Feature 依赖；UI 不反向导入 core/base/业务模块。新增普通操作按钮优先复用 `components/fa-button.uvue`（FaButton），语义图标复用 `components/fa-icon.uvue`（FaIcon，依赖工程现有 uni-icons）。FaButton 传入 `text`、`dark` 和业务状态，使用 `@press`；内部保留原生按钮并统一处理主题、禁用和 loading，间距与布局由外层容器控制。纯按钮/图标工具位于 UI 的 `common/`，公共样式位于 `styles/`；core 旧按钮 CSS 仅转引。
 - 旧项目使用前先核对是否已有 `FaButton`；未提供组件或需要特殊表情/图标按钮时，沿用当地原生 `<button>` 和共享样式工具。原生禁用颜色会覆盖 class，使用 `getButtonDisabledStyle` 绑定内联样式，不能仅添加暗色 class。具体参数与验证命令见按钮约定。
 - dialog 的页面示例不能当成共享组件；导入其他弹窗组件前先核对当地实现，不编造接口。

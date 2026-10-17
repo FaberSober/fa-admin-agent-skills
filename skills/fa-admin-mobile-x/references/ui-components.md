@@ -15,7 +15,15 @@
 | 固定行高的手柄/整行重排 | FaSortList | `@/features/fa-ui-mobile/components/fa-sort-list.uvue` | [拖动排序](components/sort.md) |
 | 固定单元高度的网格重排 | FaSortGrid | `@/features/fa-ui-mobile/components/fa-sort-grid.uvue` | [拖动排序](components/sort.md) |
 
-消费者在 `feature.json.dependsOn` 声明 `fa-ui-mobile`。组件文件按 Fa 前缀命名；导入标识用 PascalCase，模板用 kebab-case。
+消费者在 `feature.json.dependsOn` 声明 `fa-ui-mobile`。组件文件按 Fa 前缀命名；显式导入标识用 PascalCase，模板用 kebab-case。
+
+## 统一组件引用入口
+
+本工程在 `pages.config.json.easycom.custom` 统一登记上述八个 UI 组件，页面直接使用 `<fa-field>`、`<fa-button>` 等标签即可，无需逐项写 import。配置通过 `pnpm generate:pages` 生成到 `pages.json`，不要手改生成文件；保留 autoscan，沿用 uni-icons 等现有组件发现方式。
+
+输入表单 Demo 已省略 FaField / FaCard / FaButton 三行导入，可作为直接使用示例。原有显式导入仍然有效；其他业务项目先检查当地 easycom 配置，尚未配置时使用上表的显式路径。应用级 FaPageFrame / FaAppDialog / FaLoadingOverlay 仍按原方式显式导入，UI 映射只匹配现有八个组件。
+
+2026-10-17：统一映射和无显式组件导入的 Demo 已通过 UI 复用/FaField 检查，以及 SDK `5.31.2026100911-alpha` Android 资源编译及导出，日志无 warning/error；iOS 未编译。
 
 ## 最小调用片段
 
@@ -47,7 +55,7 @@
 
 ## 边界与复用规则
 
-- 首期继续显式传 `dark`。主题存储、导航栏和页面背景由 core/页面管理；共享响应式主题入口、CSS 变量试验及 easycom 简化仍是后续规划，不是现有 API。
+- 首期继续显式传 `dark`。主题存储、导航栏和页面背景由 core/页面管理；共享响应式主题入口及 CSS 变量试验仍是后续规划，不是现有 API。easycom 只简化组件引用，不提供主题注入。
 - UI Feature 无业务依赖和页面；组件可导入 Vue、`@dcloudio/uni-app`、UI 自身及工程的 `uni_modules`，保留同目录 `./文件` 引用，不导入 core/base/具体业务或通过父目录绕行。新增外部依赖需同步调整检查允许范围并说明用途；第三方运行兼容仍需单独验证。
 - UI 负责默认展示、结构、主题状态和基础事件；业务负责请求、权限、路由、校验、保存与恢复。FaCard 插槽文字、FaCellGroup 内各行仍需调用方显式绑定主题；复杂业务保留原业务组件，内部组合 UI。
 - 页面间距和尺寸留在外层容器；优先用少量预设，避免复制组件内部颜色、边框、字号和按下/禁用行为。不依赖页面 CSS 穿透组件。
@@ -63,7 +71,7 @@
 | 重置密码 | 使用 FaField / FaButton，不恢复原生控件或输入项基础样式 | 一张 class 为 `fa-card card` 的现有外层卡片、页面布局及服务端错误提示 |
 | mine-setting-entry | 使用 FaCell，不恢复 mine-setting 行模板/样式 | 原业务参数与 open(route) 事件 |
 
-检查同时核对 UI 依赖方向、组件命名、目录完整性、文档和 Demo 路径/路由。新试点在 `tests/support/ui-reuse.mjs` 的 `uiPilots` 显式登记；例外必须有具体页面和用途，避免扩大为全局豁免。
+检查同时核对 UI 依赖方向、组件命名、目录完整性、文档和 Demo 路径/路由，以及八个 easycom 映射和源配置/生成结果一致性，防止误接管应用级组件。新试点在 `tests/support/ui-reuse.mjs` 的 `uiPilots` 显式登记；例外必须有具体页面和用途，避免扩大为全局豁免。
 
 这是轻量源码检查，覆盖指定结构、导入写法与已知样式回退，不是完整 Vue/UTS AST 分析；不对全部历史 view/input 一刀切。卡片轮廓、边框几何和旧样式转引继续由 `check-cards.mjs` 检查。组件行为使用对应检查，新增界面及公共接口仍需目标端编译和运行验收。
 
