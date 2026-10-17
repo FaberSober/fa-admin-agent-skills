@@ -60,6 +60,7 @@
 | `components/button.md` | `components/button.md` |
 | `components/card.md` | `components/card.md` |
 | `components/cell.md` | `components/cell.md` |
+| `components/sort.md` | `components/sort.md` |
 | `components/dialog.md` | `components/dialog.md` |
 | `components/icon.md` | `components/icon.md` |
 | `components/loading.md` | `components/loading.md` |
