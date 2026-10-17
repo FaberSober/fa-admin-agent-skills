@@ -25,6 +25,7 @@ description: >
 | FaButton 参数、主题、禁用/加载状态与原生按钮约定 | [按钮约定](references/components/button.md) |
 | FaCard 参数、插槽、点击、主题与兼容卡片结构 | [卡片约定](references/components/card.md) |
 | FaCell / FaCellGroup 设置行、分组、禁用与业务入口 | [设置列表](references/components/cell.md) |
+| FaField 值绑定、密码、禁用、焦点和错误提示 | [输入项](references/components/field.md) |
 | FaSortList / FaSortGrid 拖动、事件签名、插槽与滚动边界 | [拖动排序](references/components/sort.md) |
 | 页面内确认或危险操作弹窗 | [弹窗示例](references/components/dialog.md) |
 | FaIcon 参数、语义名称与回退 | [图标组件](references/components/icon.md) |
@@ -37,6 +38,7 @@ description: >
 - dialog 的页面示例不能当成共享组件；导入其他弹窗组件前先核对当地实现，不编造接口。
 - 新增普通内容、列表、入口和确认卡片优先复用 `features/fa-ui-mobile/components/fa-card.uvue`（FaCard），支持显式 `dark`、`active`、`padding`（normal/small/none）、默认插槽和 `@press`。内部控件需阻止 tap 冒泡；间距和尺寸放外层容器，插槽文字主题由调用方管理。消费者声明 UI Feature 依赖；旧项目先核对是否已有组件。
 - 常规设置行优先复用 UI 的 FaCell / FaCellGroup；分组只提供卡片背景，每行显式传 `dark`，最后一行传 `border=false`。FaCell 支持标题、说明、值、图标、箭头、禁用和 `@press`；纯展示行传 `clickable=false`，隐藏箭头另传 `arrow=false`。路由与请求留在业务层；已有业务设置入口保留自身事件契约，内部复用通用行。
+- 常规输入项优先复用 UI 的 FaField，使用 `v-model`、显式 `dark`、`disabled` 与业务 `error`。组件透传原生输入能力，先同步确认值再派发 `confirm`；focus 请求随 focus/blur 事件复位。不裁剪、记录或存储密码；校验、请求及验证码倒计时仍由业务层处理，原生键盘与 maxlength 需目标端验收。
 - 固定高度列表/网格排序复用 UI 的 FaSortList / FaSortGrid，使用稳定唯一 rowKey，条目由插槽提供。列表 `sort-end(list, oldIndex, newIndex)` 与网格 `sort-end(list)` 保持不同签名；业务接收结果后更新 list 并自行保存。取消、外部更新或页面离开会废弃未完成拖动，不提供自动滚动或变高条目能力；按拖动排序文档验证原生手势和浮层。
 - 未迁移页面仍可使用 `fa-card` 宿主及首个子节点 `fa-card-surface` / `fa-card-fill` 背景结构。基础样式只在 `features/fa-ui-mobile/styles/cards.css` 维护，core 旧路径仅转引；圆角只有一处声明。边框用外层背景绘制，填充层四边显式内缩，不叠加原生 border，不重复定义背景和圆角或用 `overflow: hidden` 裁剪。自定义组件内导入公共 CSS；运行 `pnpm check --group core --name check-cards.mjs`，原生效果仍需目标端验证。
 - 触摸交互使用 `@tap`；只用目标 uni-app X 编译器支持的属性和 CSS，不直接套用 DOM/React 写法。
