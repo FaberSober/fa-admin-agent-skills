@@ -59,6 +59,7 @@
 | `page-data-loading.md` | `page-data-loading.md` |
 | `components/button.md` | `components/button.md` |
 | `components/card.md` | `components/card.md` |
+| `components/cell.md` | `components/cell.md` |
 | `components/dialog.md` | `components/dialog.md` |
 | `components/icon.md` | `components/icon.md` |
 | `components/loading.md` | `components/loading.md` |
