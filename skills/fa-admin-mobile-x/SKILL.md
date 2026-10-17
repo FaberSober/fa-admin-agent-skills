@@ -22,6 +22,7 @@ description: >
 | UTS、事件、样式、配置、验证 | [编码约定](references/coding.md) |
 | 场景选组件、真实导入、Demo 与定向复用规则 | [UI 组件目录](references/ui-components.md) |
 | 新增模块、页面、依赖或入口 | [Feature 与路由](references/feature-modules.md) |
+| 页面主题、异步操作、会话保护、查询、表单与退出流程复用 | [业务页面辅助目录](references/business-reuse.md) |
 | 主题存储、页面和导航栏配色 | [主题约定](references/theme.md) |
 | FaButton 参数、主题、禁用/加载状态与原生按钮约定 | [按钮约定](references/components/button.md) |
 | FaCard 参数、插槽、点击、主题与兼容卡片结构 | [卡片约定](references/components/card.md) |

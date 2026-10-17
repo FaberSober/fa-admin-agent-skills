@@ -55,8 +55,14 @@
 | `documentation.md` | `documentation.md` |
 | `coding.md` | `coding.md` |
 | `ui-components.md` | `ui-components.md` |
+| `tooling-and-tests.md` | `tooling-and-tests.md` |
 | `feature-modules.md` | `feature-modules.md` |
 | `theme.md` | `theme.md` |
+| `business-reuse.md` | `business-reuse.md` |
+| `page-action.md` | `page-action.md` |
+| `page-session-scope.md` | `page-session-scope.md` |
+| `forms.md` | `forms.md` |
+| `account-entry.md` | `account-entry.md` |
 | `page-data-loading.md` | `page-data-loading.md` |
 | `components/button.md` | `components/button.md` |
 | `components/card.md` | `components/card.md` |

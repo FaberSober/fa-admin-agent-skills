@@ -54,4 +54,12 @@ FaCell 参数：
 
 ## 验证
 
+### BC06 业务配置试点
+
+- 首页“我的”的 `mineSettings: MineSetting[]` 维护标题、图标和有类型的动作；页面 `handleMineSetting` 区分消息页签与页面导航。配置留在页面中，不向 UI 传入路由策略。
+- 账号与安全页的 `securityEntries: SecurityEntry[]` 维护稳定 id、标题、说明及目标路由；页面 `openSecurityEntry` 导航，模板用 `v-for` 渲染 FaCell。
+- 首页每行显式绑定主题；有 Feature 扩展入口时，内置末行仍保留分隔线；最终扩展入口沿用 isLast 和 open(route) 契约。没有扩展入口时，内置末行隐藏分隔线。
+- 这只是页面有类型的数据配置，不新增通用页面解释器、表达式求值或组件接口。复杂业务仍写在页面事件中。
+- 2026-10-17：定向首页数据、设置行、主题及 UI 复用检查通过；用户确认 BC06 验证通过。开发环境未执行本批 UTS 编译，用户验收平台和编译版本未记录。
+
 2026-10-17 UI02：`pnpm check --group core --name check-cells.mjs`、定向卡片/按钮检查及页面生成已通过；覆盖点击拦截与恢复、主题、业务事件和路由、统一分组背景及 Demo。HBuilderV 配套 SDK CLI `5.31.2026100911-alpha` Android 资源编译及导出通过，完整日志未发现 warning/error。用户确认本批人工验证通过，UI02 状态为 ✅已完成，未单独注明验收平台；本次自动化未构建 APK、未运行设备、未编译 iOS。
