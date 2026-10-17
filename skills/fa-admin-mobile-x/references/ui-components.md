@@ -21,7 +21,7 @@
 
 本工程在 `pages.config.json.easycom.custom` 统一登记上述八个 UI 组件，页面直接使用 `<fa-field>`、`<fa-button>` 等标签即可，无需逐项写 import。配置通过 `pnpm generate:pages` 生成到 `pages.json`，不要手改生成文件；保留 autoscan，沿用 uni-icons 等现有组件发现方式。
 
-输入表单 Demo 已省略 FaField / FaCard / FaButton 三行导入，可作为直接使用示例。原有显式导入仍然有效；其他业务项目先检查当地 easycom 配置，尚未配置时使用上表的显式路径。应用级 FaPageFrame / FaAppDialog / FaLoadingOverlay 仍按原方式显式导入，UI 映射只匹配现有八个组件。
+输入表单 Demo 可作为直接使用示例；其余业务页面、业务组件和 Demo 也已统一省略仅用于模板的 UI 导入（本批 26 个文件、36 行）。UI 库内部的 FaCell → FaIcon、FaCellGroup → FaCard 依赖保留显式导入，便于模块独立复用。原有显式导入仍然有效；其他业务项目先检查当地 easycom 配置，尚未配置时使用上表的显式路径。应用级 FaPageFrame / FaAppDialog / FaLoadingOverlay 及工具函数仍按原方式显式导入，UI 映射只匹配现有八个组件。
 
 2026-10-17：统一映射和无显式组件导入的 Demo 已通过 UI 复用/FaField 检查，以及 SDK `5.31.2026100911-alpha` Android 资源编译及导出，日志无 warning/error；iOS 未编译。
 
