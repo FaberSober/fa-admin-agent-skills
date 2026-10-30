@@ -1,7 +1,7 @@
 ---
 name: fa-admin-backend
 description: >
-  FA Admin 框架（Java/Spring Boot + MyBatis-Plus）后端开发规范。在新增或修改业务模块、CRUD、Entity、Mapper、Biz、Controller、DDL、枚举、字典、校验、Excel、缓存、SSE/WebSocket、MQTT/Kafka、多数据源、测试部署时使用。适用于以 fa-core/fa-base 为基座的 FA Admin 业务项目。
+  FA Admin 框架（Java/Spring Boot + MyBatis-Plus）后端开发规范。在新增或修改业务模块、CRUD、Entity、Mapper、Biz、Controller、DDL、枚举、字典、校验、Excel、缓存、Quartz 定时任务及执行日志、SSE/WebSocket、MQTT/Kafka、多数据源、测试部署时使用。适用于以 fa-core/fa-base 为基座的 FA Admin 业务项目。
 ---
 
 # FA Admin 后端
@@ -15,6 +15,10 @@ description: >
 5. 编译目标模块，检查泛型 Key、路径、基类继承是否一致。
 
 完整端到端步骤见 [references/crud/new-module.md](references/crud/new-module.md)。
+
+## 常用场景：定时任务执行日志
+
+业务任务继承 `BaseJob`，在关键步骤调用 `JobRunLogger`。管理端的“记录详细日志”默认关闭，开启并保存后对新执行生效，历史记录不补生成日志。接入示例、操作步骤、线程池和排查见 [references/infra/job.md](references/infra/job.md)。
 
 ## 参考文档
 
@@ -35,6 +39,7 @@ description: >
 | Excel 导入导出 | [excel/excel.md](references/excel/excel.md) |
 | 缓存、Redis 锁 | [infra/cache-redis.md](references/infra/cache-redis.md) |
 | 线程池、异步上下文 | [infra/thread.md](references/infra/thread.md) |
+| Quartz 定时任务、执行日志接入与操作 | [infra/job.md](references/infra/job.md) |
 | Forest 外部 API | [infra/api-forest.md](references/infra/api-forest.md) |
 | Jackson 序列化 | [infra/jackson.md](references/infra/jackson.md) |
 | SSE 流式、AI 接口 | [infra/sse.md](references/infra/sse.md) |
