@@ -51,6 +51,7 @@ description: >
 ## 硬规则
 
 - 双库脚本必须同时提供 `mysql` 和 `postgre`，不回退另一种方言。
+- 新增或修改版本 SQL 前，必读 [DDL 文件头规则](references/data/ddl.md#sql-文件头与验证)；使用完整双分隔线文件头并验证解析，不能只写 `@@ver` / `@@info`。
 - 不重写基类已有端点；自定义逻辑放 Biz。
 - 不把密钥/密码/token 写进代码或仓库。
 - `upd_time` 由 MyBatis-Plus 自动填充，DDL 不写 `ON UPDATE`、不建触发器。
